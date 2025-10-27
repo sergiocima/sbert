@@ -43,10 +43,23 @@ st.markdown("---")
 # ==================== CARICAMENTO MODELLO ====================
 @st.cache_resource
 def load_model():
-    """Carica il modello SBERT multilingue"""
+    """Carica il modello SBERT multilingue (ottimizzato per cloud)"""
+    import os
+    
+    # Controlla se il modello è già nel repository (pre-scaricato)
+    local_model_path = "./sbert_model"
+    
     with st.spinner("⏳ Caricamento modello SBERT multilingue..."):
-        model = SentenceTransformer('all-MiniLM-L6-v2')
-    st.success("✅ Modello caricato con successo!")
+        if os.path.exists(local_model_path):
+            # Carica da locale (più veloce, no download)
+            model = SentenceTransformer(local_model_path)
+            st.success("✅ Modello caricato da repository locale!")
+        else:
+            # Scarica da Hugging Face (più lento al primo avvio)
+            # paraphrase-MiniLM-L3-v2: 61MB, veloce e accurato
+            model = SentenceTransformer('paraphrase-MiniLM-L3-v2')
+            st.success("✅ Modello scaricato e caricato!")
+    
     return model
 
 model = load_model()
